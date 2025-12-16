@@ -6,8 +6,8 @@ DIRNOW = os.path.dirname(os.path.abspath(__file__))
 
 class NetworkError(Exception):
     def __init__(self, msg):
-        super().__init__(self.msg)
         self.msg = msg
+        super().__init__(self.msg)
 
 PTH_LIST = {
     os.path.join(DIRNOW, "model", "unet_model_part_000.pth"): 
@@ -24,9 +24,9 @@ def download_all_pth(MAX_TRY:int=3):
     for filepath in PTH_LIST:
         file_url = PTH_LIST[filepath]
 
+        fail_cnt = 0
+        suc=False
         if not os.path.isfile(filepath):
-            fail_cnt = 0
-            suc=False
             while fail_cnt < MAX_TRY:
                 try:
                     print(f"downloading {file_url}")
@@ -39,6 +39,8 @@ def download_all_pth(MAX_TRY:int=3):
                     time.sleep(3)
                 if suc:
                     break
+        else:
+            suc=True
         
         if fail_cnt >= MAX_TRY and not suc:
-            raise NetworkError("can not download file from {file_url}")
+            raise NetworkError(f"can not download file from {file_url}")

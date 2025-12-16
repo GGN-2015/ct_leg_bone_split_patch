@@ -1,6 +1,6 @@
 [project]
 name = "ct-leg-bone-split-patch"
-version = "0.1.1"
+version = "0.1.2"
 description = "Given a 128×128 grayscale image representing a CT cross-sectional slice, identify bone tissue from it and generate a binary mask."
 authors = [
     {name = "GGN_2015",email = "neko@jlulug.org"}

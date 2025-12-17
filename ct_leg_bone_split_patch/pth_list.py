@@ -21,7 +21,7 @@ PTH_LIST = {
 PTH_LIST.update({
     os.path.join(MRI_MODEL_PATH, f"mri_best_model_a{chr(i)}.pth"): 
         f"https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_a{chr(i)}.pth"
-    for i in range(ord('a', ord('l') + 1))
+    for i in range(ord('a'), ord('l') + 1)
 })
 
 def download_all_pth(MAX_TRY:int=5):

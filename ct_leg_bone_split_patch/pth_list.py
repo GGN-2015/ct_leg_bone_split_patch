@@ -34,13 +34,13 @@ def download_all_pth(MAX_TRY:int=5):
         if not os.path.isfile(filepath):
             while fail_cnt < MAX_TRY:
                 try:
-                    print(f"\033[1;33downloading {file_url} ...\033[0m")
+                    print(f"\033[1;33mdownloading {file_url} ...\033[0m")
                     download_file(file_url, filepath)
                     suc = True
-                    print(f"\033[1;32downloading {file_url} successfully\033[0m")
+                    print(f"\033[1;32mdownloading {file_url} successfully\033[0m")
                 except:
                     fail_cnt += 1
-                    print(f"\033[1;33downloading {file_url} failed, fail_cnt: {fail_cnt} \033[0m")
+                    print(f"\033[1;33mdownloading {file_url} failed, fail_cnt: {fail_cnt} \033[0m")
                     traceback.print_exc()
                     time.sleep(3)
                 if suc:

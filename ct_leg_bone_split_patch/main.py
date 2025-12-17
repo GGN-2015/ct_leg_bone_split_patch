@@ -1,6 +1,6 @@
 from .unet import UNet
 from .blur import gaussian_smooth_2d
-from .pth_list import download_all_pth, DIRNOW
+from .pth_list import download_all_pth, MODEL_PATH, MRI_MODEL_PATH
 
 from PIL import Image
 from torchvision import transforms
@@ -11,7 +11,6 @@ import numpy as np
 from typing import List
 from io import BytesIO
 
-MODEL_PATH = os.path.join(DIRNOW, "model")
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 IMAGE_SIZE = (256, 256)
 
@@ -37,17 +36,20 @@ def merge_files_to_state_dict(folder_path: str) -> dict:
     except Exception as e:
         raise RuntimeError(f"解析合并后的模型数据失败：{e}") from e
 
-@functools.lru_cache(maxsize=1)
-def load_unet_model() -> UNet:
+@functools.lru_cache(maxsize=2)
+def load_unet_model(mri=False) -> UNet:
     download_all_pth()
     
     unet = UNet(n_channels=1, n_classes=1, bilinear=False)
     unet.to(DEVICE)
-    unet.load_state_dict(merge_files_to_state_dict(MODEL_PATH))
+    if not mri:
+        unet.load_state_dict(merge_files_to_state_dict(MODEL_PATH))
+    else:
+        unet.load_state_dict(merge_files_to_state_dict(MRI_MODEL_PATH))
     unet.eval()
     return unet
 
-def map_image(grey_image: Image.Image) -> Image.Image:
+def map_image(grey_image: Image.Image, mri=False) -> Image.Image:
     base_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Resize(IMAGE_SIZE),
@@ -65,7 +67,7 @@ def map_image(grey_image: Image.Image) -> Image.Image:
     assert tensor.ndim == 3, f"Tensor维度必须为3，当前{tensor.ndim}维"
     images = tensor.unsqueeze(0).to(DEVICE)  # (1, 1, 256, 256)
 
-    unet = load_unet_model()
+    unet = load_unet_model(mri)
     with torch.no_grad():
         output_bone = unet(images)
         assert output_bone.ndim == 4, f"模型输出维度必须为4，当前{output_bone.ndim}维"

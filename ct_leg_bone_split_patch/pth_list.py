@@ -1,7 +1,6 @@
 import os
-import traceback
-import time
-from .download import download_file
+from remote_auto_fetch import remote_auto_fetch
+
 DIRNOW = os.path.dirname(os.path.abspath(__file__))
 
 MODEL_PATH = os.path.join(DIRNOW, "model")
@@ -24,29 +23,29 @@ PTH_LIST.update({
     for i in range(ord('a'), ord('l') + 1)
 })
 
+HASH_VALUE = {
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/pth_binary/unet_model_part_000.pth"   : "476d47d31437a62710f3d6a56024df17",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/pth_binary/unet_model_part_001.pth"   : "ca1c6c8d3d5a25d32a332a373cfedef9",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/pth_binary/unet_model_part_002.pth"   : "102f998105f7fa398befb58e06f42e42",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/pth_binary/unet_model_part_003.pth"   : "c746d571f84c0f030f6d29506f292229",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_aa.pth" : "5e4bc4e849099f0b36b976d4df153b96",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_ab.pth" : "0891480debd1ddc0cbaf2595a392a320",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_ac.pth" : "425b09e29f9e67eba09e4bda6fba4efa",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_ad.pth" : "d2c69772131cb3a2b80fcd6e6da255dd",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_ae.pth" : "d133e462067095f171ed40c018174434",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_af.pth" : "e7f39f66d59537652100c7c5025d0ebc",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_ag.pth" : "4f0de627ff6f31c8db9c8f416548ab92",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_ah.pth" : "f8c80bebc14f893af575f69899b3719c",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_ai.pth" : "9e95ca8f87f3cde97f85bd2f5c18a1db",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_aj.pth" : "9cca59e2b493caa3fc581c0502f7fd54",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_ak.pth" : "cb7c45327ec62f485a48cc2578901eb4",
+    "https://github.com/GGN-2015/ct_leg_bone_split_patch/releases/download/mri_pth_binary/mri_best_model_al.pth" : "4c1f4da89d26db5b3922c9aea837f01e",
+}
+
 def download_all_pth(MAX_TRY:int=5):
     print(f"\033[1;33mdownloading {len(PTH_LIST)} files ...\033[0m")
     for filepath in PTH_LIST:
         file_url = PTH_LIST[filepath]
-
-        fail_cnt = 0
-        suc=False
-        if not os.path.isfile(filepath):
-            while fail_cnt < MAX_TRY:
-                try:
-                    print(f"\033[1;33mdownloading {file_url} ...\033[0m")
-                    download_file(file_url, filepath)
-                    suc = True
-                    print(f"\033[1;32mdownloading {file_url} successfully\033[0m")
-                except:
-                    fail_cnt += 1
-                    print(f"\033[1;33mdownloading {file_url} failed, fail_cnt: {fail_cnt} \033[0m")
-                    traceback.print_exc()
-                    time.sleep(3)
-                if suc:
-                    break
-        else:
-            suc=True
-        
-        if fail_cnt >= MAX_TRY and not suc:
-            raise NetworkError(f"can not download file from {file_url}")
+        remote_auto_fetch(file_url, filepath, HASH_VALUE.get(file_url), max_try=MAX_TRY)
+    for filepath in PTH_LIST:
+        assert os.path.isfile(filepath)
